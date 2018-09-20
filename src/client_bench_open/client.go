@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"genericsmrproto"
 	"log"
-	"masterproto"
 	"math/rand"
 	"net"
-	"net/rpc"
 	"os"
 	"os/signal"
 	"state"
@@ -17,9 +15,8 @@ import (
 	"time"
 )
 
-var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
-var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
-var serverId *int = flag.Int("sid", -1, "ID of the servers to connect to")
+var serverAddr *string = flag.String("saddr", "127.0.0.1", "Address of the server to connect to")
+var serverPort *int = flag.Int("sport", 7070, "Port of the server to connect to")
 
 var keys *int = flag.Int("keys", 1000000, "Total number of keys")
 var nConns *int = flag.Int("c", 1, "Number of client connections to create")
@@ -32,20 +29,9 @@ var rsp []bool
 func main() {
 	flag.Parse()
 
-	master, err := rpc.DialHTTP("tcp", fmt.Sprintf("%s:%d", *masterAddr, *masterPort))
-	if err != nil {
-		log.Fatalf("Error connecting to master\n")
-	}
-
-	rlReply := new(masterproto.GetReplicaListReply)
-	err = master.Call("Master.GetReplicaList", new(masterproto.GetReplicaListArgs), rlReply)
-	if err != nil {
-		log.Fatalf("Error making the GetReplicaList RPC")
-	}
-
 	// create nConns client connections. Each will try to reach its opsSec target.
 	for i := 0; i < *nConns; i++ {
-		startClientConnection(rlReply.ReplicaList[*serverId])
+		startClientConnection(fmt.Sprintf("%s:%d", *serverAddr, *serverPort))
 	}
 
 	sig := make(chan os.Signal, 1)
@@ -57,7 +43,7 @@ func startClientConnection(rAddr string) {
 	var err error
 	server, err := net.Dial("tcp", rAddr)
 	if err != nil {
-		log.Printf("Error connecting to replica %d\n", serverId)
+		log.Printf("Error connecting to replica at %s\n", rAddr)
 	}
 	reader := bufio.NewReader(server)
 	writer := bufio.NewWriter(server)
