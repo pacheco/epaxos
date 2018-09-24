@@ -19,7 +19,7 @@ var serverPort *int = flag.Int("sport", 7070, "Port of the server to connect to"
 
 var keys *int = flag.Int("keys", 1000000, "Total number of keys")
 var nConns *int = flag.Int("c", 1, "Number of client connections to create")
-var outstanding *int = flag.Int("o", 1, "Number of outstanding connections")
+var outstanding *int = flag.Int("o", 1, "Number of outstanding requests")
 
 var N int
 
@@ -30,7 +30,7 @@ func main() {
 
 	// create nConns client connections. Each will have a number of outstanding operations
 	for i := 0; i < *nConns; i++ {
-		startClientConnection(fmt.Sprintf("%s:%d", *serverAddr, *serverPort))
+		go clientConnection(fmt.Sprintf("%s:%d", *serverAddr, *serverPort))
 	}
 
 	sig := make(chan os.Signal, 1)
@@ -38,7 +38,7 @@ func main() {
 	<-sig
 }
 
-func startClientConnection(rAddr string) {
+func clientConnection(rAddr string) {
 	var err error
 	server, err := net.Dial("tcp", rAddr)
 	if err != nil {
