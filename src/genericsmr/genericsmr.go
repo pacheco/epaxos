@@ -12,6 +12,7 @@ import (
 	"os"
 	"rdtsc"
 	"state"
+	"strings"
 	"time"
 )
 
@@ -191,9 +192,11 @@ func (r *Replica) waitForPeerConnections(done chan bool) {
 	var b [4]byte
 	bs := b[:4]
 
-	listener, err := net.Listen("tcp", r.PeerAddrList[r.Id])
+	// listener, err := net.Listen("tcp", fmt.Sprintf(":%d", r.Port))
+	port := strings.Split(r.PeerAddrList[r.Id], ":")[1]
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		panic(fmt.Sprintf("could not listen at %s: %s", r.PeerAddrList[r.Id], err))
+		panic(err)
 	}
 	r.Listener = listener
 	for i := r.Id + 1; i < int32(r.N); i++ {
