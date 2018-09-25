@@ -40,6 +40,7 @@ func main() {
 
 func clientConnection(rAddr string) {
 	var err error
+	log.Printf("Connecting to replica at %s\n", rAddr)
 	server, err := net.Dial("tcp", rAddr)
 	if err != nil {
 		log.Printf("Error connecting to replica at %s\n", rAddr)
