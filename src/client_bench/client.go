@@ -78,7 +78,7 @@ func clientConnection(rAddr string) {
 func propose(pending map[int32]time.Time, w *bufio.Writer) {
 	id := rand.Int31()
 	key := rand.Int63n(int64(*keys))
-	val := 0
+	val := key
 	args := genericsmrproto.Propose{id, state.Command{state.PUT, state.Key(key), state.Value(val)}, 0}
 	pending[id] = time.Now()
 	w.WriteByte(genericsmrproto.PROPOSE)

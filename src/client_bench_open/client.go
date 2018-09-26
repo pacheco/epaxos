@@ -68,7 +68,7 @@ func clientWriter(w *bufio.Writer, pending map[int32]time.Time, m *sync.Mutex) {
 			now := time.Now()
 			id := rand.Int31()
 			key := rand.Int63n(int64(*keys))
-			val := 0
+			val := key
 			args := genericsmrproto.Propose{id, state.Command{state.PUT, state.Key(key), state.Value(val)}, 0}
 			m.Lock()
 			pending[id] = now
