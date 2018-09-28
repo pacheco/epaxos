@@ -27,6 +27,7 @@ var N int
 var rsp []bool
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	flag.Parse()
 
 	// create nConns client connections. Each will try to reach its opsSec target.

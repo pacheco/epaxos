@@ -39,6 +39,7 @@ func main() {
 }
 
 func clientConnection(rAddr string) {
+	rand.Seed(time.Now().UnixNano())
 	var err error
 	log.Printf("Connecting to replica at %s\n", rAddr)
 	server, err := net.Dial("tcp", rAddr)
